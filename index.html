@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Local Magazine Viewer</title>
+<title>Magazine Viewer</title>
 <style>
   body {
     margin: 0;
@@ -62,11 +62,11 @@
 </div>
 
 <script>
-  // Automatically generate all image URLs from wnsep2 folder
+  // Automatically load images from the wnsep2 folder in the same repo
   const totalPages = 34;
   const pages = [];
   for(let i = 1; i <= totalPages; i++) {
-    pages.push(`wnsep2/${i}.png`); // or .png if your images are PNG
+    pages.push(`wnsep2/${i}.png`); // change to .jpg if your files are JPG
   }
 
   let currentIndex = 0;
@@ -90,14 +90,14 @@
     }
   }
 
-  // Initialize
-  updatePages();
-
-  // Optional: keyboard support
+  // Keyboard support
   window.addEventListener('keydown', e => {
     if(e.key === 'ArrowLeft') prevPage();
     if(e.key === 'ArrowRight') nextPage();
   });
+
+  // Initialize
+  updatePages();
 </script>
 
 </body>
