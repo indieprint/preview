@@ -62,11 +62,14 @@
 </div>
 
 <script>
-  // Automatically load images from the wnsep2 folder in the same repo
-  const totalPages = 34;
+  // Get the folder from the URL query (?magazine=wnsep2)
+  const folder = new URLSearchParams(window.location.search).get('magazine') || 'wnsep2';
+
+  const totalPages = 34; // Change if some previews have different page counts
   const pages = [];
-  for(let i = 1; i <= totalPages; i++) {
-    pages.push(`wnsep2/${i}.png`); // change to .jpg if your files are JPG
+
+  for (let i = 1; i <= totalPages; i++) {
+    pages.push(`${folder}/${i}.png`); // Change .png to .jpg if needed
   }
 
   let currentIndex = 0;
