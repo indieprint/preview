@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Magazine Viewer</title>
-
 <style>
   body {
     margin: 0;
@@ -16,14 +15,12 @@
     font-family: sans-serif;
     position: relative;
   }
-
   .magazine {
     display: flex;
     justify-content: center;
     width: 100%;
     max-width: 1200px;
   }
-
   .page {
     flex: 1;
     background: #000;
@@ -31,13 +28,11 @@
     align-items: center;
     justify-content: center;
   }
-
   .page img {
     width: 100%;
     height: auto;
     display: block;
   }
-
   .button {
     position: absolute;
     top: 50%;
@@ -51,17 +46,14 @@
     font-weight: bold;
     z-index: 1000;
   }
-
   .prev { left: 20px; }
   .next { right: 20px; }
-
   @media (max-width: 768px) {
     .button.prev { left: 10px; }
     .button.next { right: 10px; }
   }
 </style>
 </head>
-
 <body>
 
 <div class="magazine">
@@ -73,14 +65,13 @@
 <button class="button next" onclick="nextPage()">▶</button>
 
 <script>
-  // ===== CONFIG =====
-  const folder =
-    new URLSearchParams(window.location.search).get("magazine") || "wnj3";
+  // Get folder from query string ?magazine=
+  const folder = new URLSearchParams(window.location.search).get("magazine") || "wnj3";
 
-  const totalPages = 34; // change if another issue has more/less pages
+  const totalPages = 34; // always 34 pages
   let currentIndex = 0;
 
-  // ----- Filename resolver (supports all InDesign exports) -----
+  // Try common filename patterns
   function filenameOptions(n) {
     const z = String(n).padStart(2, "0");
     return [
@@ -110,7 +101,6 @@
     tryNext();
   }
 
-  // ----- Page Rendering -----
   function updatePages() {
     const left = document.getElementById("pageLeft");
     const right = document.getElementById("pageRight");
@@ -133,7 +123,6 @@
     }
   }
 
-  // ----- Navigation -----
   function nextPage() {
     if (currentIndex === 0) currentIndex = 1;
     else if (currentIndex + 2 < totalPages) currentIndex += 2;
