@@ -42,7 +42,7 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(96,165,250,0.8);
+    background: rgba(96,165,250,0.85);
     color: #021024;
     border: none;
     padding: 12px 18px;
@@ -65,8 +65,8 @@
 <body>
 
 <div class="magazine">
-  <div class="page"><img id="pageLeft"></div>
-  <div class="page"><img id="pageRight"></div>
+  <div class="page"><img id="pageLeft" alt=""></div>
+  <div class="page"><img id="pageRight" alt=""></div>
 </div>
 
 <button class="button prev" onclick="prevPage()">◀</button>
@@ -74,12 +74,13 @@
 
 <script>
   // ===== CONFIG =====
-  const folder = "wnfeb1";   // EXACT folder name
-  const totalPages = 34;
+  const folder =
+    new URLSearchParams(window.location.search).get("magazine") || "wnj3";
 
+  const totalPages = 34; // change if another issue has more/less pages
   let currentIndex = 0;
 
-  // Try all valid filename formats
+  // ----- Filename resolver (supports all InDesign exports) -----
   function filenameOptions(n) {
     const z = String(n).padStart(2, "0");
     return [
@@ -109,6 +110,7 @@
     tryNext();
   }
 
+  // ----- Page Rendering -----
   function updatePages() {
     const left = document.getElementById("pageLeft");
     const right = document.getElementById("pageRight");
@@ -117,12 +119,12 @@
       left.style.display = "none";
       right.style.display = "block";
       loadImage(right, 1);
-    }
+    } 
     else if (currentIndex === totalPages - 1) {
       left.style.display = "block";
       right.style.display = "none";
       loadImage(left, totalPages);
-    }
+    } 
     else {
       left.style.display = "block";
       right.style.display = "block";
@@ -131,6 +133,7 @@
     }
   }
 
+  // ----- Navigation -----
   function nextPage() {
     if (currentIndex === 0) currentIndex = 1;
     else if (currentIndex + 2 < totalPages) currentIndex += 2;
