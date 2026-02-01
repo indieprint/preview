@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Magazine Viewer</title>
+
 <style>
   body {
     margin: 0;
@@ -21,27 +22,19 @@
     justify-content: center;
     width: 100%;
     max-width: 1200px;
-    height: auto;
-    gap: 0;
   }
 
   .page {
     flex: 1;
-    height: auto;
     background: #000;
-    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0;
-    box-shadow: none;
   }
 
   .page img {
     width: 100%;
     height: auto;
-    object-fit: contain;
-    background: #000;
     display: block;
   }
 
@@ -58,87 +51,102 @@
     font-weight: bold;
     z-index: 1000;
   }
+
   .prev { left: 20px; }
   .next { right: 20px; }
 
   @media (max-width: 768px) {
-    body { padding: 10px; min-height: auto; }
-    .magazine { width: 100%; height: auto; }
-    .page { flex: 1; height: auto; }
     .button.prev { left: 10px; }
     .button.next { right: 10px; }
   }
 </style>
 </head>
+
 <body>
 
 <div class="magazine">
-  <div class="page"><img id="pageLeft" src="" alt="Page Left"></div>
-  <div class="page"><img id="pageRight" src="" alt="Page Right"></div>
+  <div class="page"><img id="pageLeft"></div>
+  <div class="page"><img id="pageRight"></div>
 </div>
 
 <button class="button prev" onclick="prevPage()">◀</button>
 <button class="button next" onclick="nextPage()">▶</button>
 
 <script>
-  // ---- CONFIG ----
-  const folder = new URLSearchParams(window.location.search).get('magazine') || 'wnsep2';
+  // ===== CONFIG =====
+  const folder = "wnfeb1";   // EXACT folder name
   const totalPages = 34;
-  const prefix = "";      // e.g., "" for 1.jpg, "page" for page1.jpg
-  const leadingZeros = true; // true if files have leading zeros like 01.jpg
-
-  // ---- PAGE LIST ----
-  const pages = [];
-  for (let i = 1; i <= totalPages; i++) {
-    let num = i;
-    if (leadingZeros) {
-      const digits = String(totalPages).length; // auto detect width
-      num = String(i).padStart(digits, '0');
-    }
-    pages.push(`${folder}/${prefix}${num}.jpg`);
-  }
 
   let currentIndex = 0;
 
-  // ---- PAGE UPDATE FUNCTION ----
+  // Try all valid filename formats
+  function filenameOptions(n) {
+    const z = String(n).padStart(2, "0");
+    return [
+      `${folder}/${n}.jpg`,
+      `${folder}/${z}.jpg`,
+      `${folder}/page${n}.jpg`,
+      `${folder}/page${z}.jpg`
+    ];
+  }
+
+  function loadImage(img, pageNumber) {
+    const options = filenameOptions(pageNumber);
+    let i = 0;
+
+    function tryNext() {
+      if (i >= options.length) {
+        img.src = "";
+        return;
+      }
+      img.onerror = () => {
+        i++;
+        tryNext();
+      };
+      img.src = options[i];
+    }
+
+    tryNext();
+  }
+
   function updatePages() {
-    const left = document.getElementById('pageLeft');
-    const right = document.getElementById('pageRight');
+    const left = document.getElementById("pageLeft");
+    const right = document.getElementById("pageRight");
 
     if (currentIndex === 0) {
       left.style.display = "none";
       right.style.display = "block";
-      right.src = pages[0];
-    } else if (currentIndex === totalPages - 1) {
+      loadImage(right, 1);
+    }
+    else if (currentIndex === totalPages - 1) {
       left.style.display = "block";
       right.style.display = "none";
-      left.src = pages[totalPages - 1];
-    } else {
+      loadImage(left, totalPages);
+    }
+    else {
       left.style.display = "block";
       right.style.display = "block";
-      left.src = pages[currentIndex];
-      right.src = pages[currentIndex + 1] || "";
+      loadImage(left, currentIndex + 1);
+      loadImage(right, currentIndex + 2);
     }
   }
 
-  // ---- NAVIGATION ----
   function nextPage() {
     if (currentIndex === 0) currentIndex = 1;
     else if (currentIndex + 2 < totalPages) currentIndex += 2;
-    else if (currentIndex + 1 < totalPages) currentIndex = totalPages - 1;
+    else currentIndex = totalPages - 1;
     updatePages();
   }
 
   function prevPage() {
     if (currentIndex === 1) currentIndex = 0;
     else if (currentIndex - 2 >= 1) currentIndex -= 2;
-    else if (currentIndex === totalPages - 1) currentIndex = totalPages - 2;
     updatePages();
   }
 
-  window.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') prevPage();
-    if (e.key === 'ArrowRight') nextPage();
+  window.addEventListener("keydown", e => {
+    if (e.key === "ArrowLeft") prevPage();
+    if (e.key === "ArrowRight") nextPage();
   });
 
   updatePages();
