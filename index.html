@@ -13,41 +13,38 @@
     align-items: center;
     min-height: 100vh;
     font-family: sans-serif;
-    position: relative; /* needed for absolute buttons */
+    position: relative;
   }
 
-  /* Container for pages */
   .magazine {
     display: flex;
     justify-content: center;
     width: 100%;
-    max-width: 1200px; /* fixed width for consistent desktop view */
-    height: auto;       /* natural height based on images */
-    gap: 0;             /* no space between pages */
+    max-width: 1200px;
+    height: auto;
+    gap: 0;
   }
 
-  /* Each page */
   .page {
     flex: 1;
-    height: auto;       /* scale naturally */
+    height: auto;
     background: #000;
     overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 0;
-    box-shadow: none;   /* remove shadows for seamless spread */
+    box-shadow: none;
   }
 
   .page img {
     width: 100%;
-    height: auto;       /* maintain aspect ratio */
+    height: auto;
     object-fit: contain;
     background: #000;
     display: block;
   }
 
-  /* Navigation buttons */
   .button {
     position: absolute;
     top: 50%;
@@ -59,26 +56,15 @@
     cursor: pointer;
     border-radius: 8px;
     font-weight: bold;
-    z-index: 1000; /* ensure buttons are above pages */
+    z-index: 1000;
   }
   .prev { left: 20px; }
   .next { right: 20px; }
 
-  /* Mobile scaling */
   @media (max-width: 768px) {
-    body {
-      min-height: auto;
-      padding: 10px;
-    }
-    .magazine {
-      width: 100%;
-      height: auto;
-      gap: 0;
-    }
-    .page {
-      flex: 1;
-      height: auto;
-    }
+    body { padding: 10px; min-height: auto; }
+    .magazine { width: 100%; height: auto; }
+    .page { flex: 1; height: auto; }
     .button.prev { left: 10px; }
     .button.next { right: 10px; }
   }
@@ -95,34 +81,39 @@
 <button class="button next" onclick="nextPage()">▶</button>
 
 <script>
+  // ---- CONFIG ----
   const folder = new URLSearchParams(window.location.search).get('magazine') || 'wnsep2';
   const totalPages = 34;
-  const pages = [];
+  const prefix = "";      // e.g., "" for 1.jpg, "page" for page1.jpg
+  const leadingZeros = true; // true if files have leading zeros like 01.jpg
 
+  // ---- PAGE LIST ----
+  const pages = [];
   for (let i = 1; i <= totalPages; i++) {
-    pages.push(`${folder}/${i}.jpg`);
+    let num = i;
+    if (leadingZeros) {
+      const digits = String(totalPages).length; // auto detect width
+      num = String(i).padStart(digits, '0');
+    }
+    pages.push(`${folder}/${prefix}${num}.jpg`);
   }
 
   let currentIndex = 0;
 
+  // ---- PAGE UPDATE FUNCTION ----
   function updatePages() {
     const left = document.getElementById('pageLeft');
     const right = document.getElementById('pageRight');
 
-    // First page: only right
     if (currentIndex === 0) {
       left.style.display = "none";
       right.style.display = "block";
       right.src = pages[0];
-    }
-    // Last page: only left
-    else if (currentIndex === totalPages - 1) {
+    } else if (currentIndex === totalPages - 1) {
       left.style.display = "block";
       right.style.display = "none";
       left.src = pages[totalPages - 1];
-    }
-    // Middle spreads: show both
-    else {
+    } else {
       left.style.display = "block";
       right.style.display = "block";
       left.src = pages[currentIndex];
@@ -130,25 +121,18 @@
     }
   }
 
+  // ---- NAVIGATION ----
   function nextPage() {
-    if (currentIndex === 0) {
-      currentIndex = 1; // first spread
-    } else if (currentIndex + 2 < totalPages) {
-      currentIndex += 2;
-    } else if (currentIndex + 1 < totalPages) {
-      currentIndex = totalPages - 1; // last page alone
-    }
+    if (currentIndex === 0) currentIndex = 1;
+    else if (currentIndex + 2 < totalPages) currentIndex += 2;
+    else if (currentIndex + 1 < totalPages) currentIndex = totalPages - 1;
     updatePages();
   }
 
   function prevPage() {
-    if (currentIndex === 1) {
-      currentIndex = 0; // back to cover
-    } else if (currentIndex - 2 >= 1) {
-      currentIndex -= 2;
-    } else if (currentIndex === totalPages - 1) {
-      currentIndex = totalPages - 2; // back to last spread
-    }
+    if (currentIndex === 1) currentIndex = 0;
+    else if (currentIndex - 2 >= 1) currentIndex -= 2;
+    else if (currentIndex === totalPages - 1) currentIndex = totalPages - 2;
     updatePages();
   }
 
